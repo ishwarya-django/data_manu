@@ -1,0 +1,273 @@
+{% extends 'data/layout.html'%}
+{% load static %}
+{% block content %}
+    <style>
+        .image-holder {
+            /* width: 250px; */
+            max-width: 250px;
+            height: 150px;
+            background: #999;
+            position: relative;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .image-holder img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        #other_name,
+        #other_place,
+        #other_phone_number {
+            display: none;
+        }
+        #irregular_expense{
+            display: none;
+        }
+    </style>
+
+    <div class="container">
+        <div class="container">
+            <div class="err_msg">
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <div {% if message.tags %} class="alert alert-{{ message.tags }} alert-dismissible fade show" {% endif %} role="alert">
+                   <h2> <strong>{{ message }}</strong></h2>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                {% endfor %}
+            </ul>
+            {% endif %}
+
+            {{form.errors}}
+        </div>
+
+        <div class="card p-5">
+            <h3 class="text-center">Add Product</h3>
+            <hr class="hr-center">
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+
+                        <div class="col-md-6 mt-2">
+                            <label for="product_name">Product&nbsp;Name&nbsp;:</label>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            {% if t %}
+                            {% for i,j in t %}
+                            <input type="text" name="product_name" class="form-control" id="product_name" value="{{i}}" required><br>
+                            {% if j %}<span class="text-danger">{{j}}</span>{% endif %}
+                            {% endfor %}
+                            {% else %}
+                            <input type="text" name="product_name" class="form-control" id="product_name" value="{{form.product_name.value}}" required>
+                            {% endif %}
+                            <span class="text-danger">{{form.errors.product_name}}</span>
+                    
+                    </div>
+
+
+                </div>
+                <hr class="hr-center">
+                <div class="mt-2 text-center">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="reset" class="btn btn-danger">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<div class="container-fluid">
+        <div class="card mt-5 p-5">
+            <div class="table-responsive">
+                <table id="example" class="table table-striped table-bordered table-hover" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">S.No</th>
+                            <th rowspan="2">Product&nbsp;Name</th>
+                            <th rowspan="2">sell price</th>
+                            <th colspan="3">Product manufacturing</th>
+                            <th rowspan="2">Price of product from shop</th>
+
+                            <th rowspan="2">status</th>
+                           
+                            <th rowspan="2">price of profit/loss</th>
+                            <th rowspan="2">Action</th>
+                        
+                        </tr>
+                        <tr>
+                            <th>Manufacturing Amount</th>
+                            <th>Status</th>
+                            <th>price of profit/loss</th>
+                        </tr>
+
+                     
+                    </thead>
+                    <tbody>
+                        {% for i in x %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{i.product_name}}</td>
+                            <td>{{i.sell_price}}</td>
+                            <td>{{i.makeproduct_price}}</td>
+                            {% if i.status_makeproduct == 'profit' %}
+                            <td class="text-success">{{i.status_makeproduct}}</td>
+                            {% elif i.status_makeproduct == 'loss' %}
+                            <td class="text-danger">{{i.status_makeproduct}}</td>
+                            {% else %}
+                            <td >{{i.status_makeproduct}}</td>
+
+                        {% endif %}
+
+                        {% if i.status_makeproduct == 'profit' %}
+                        <td class="text-success">{{i.pro_loss_makeproduct}}</td>
+                        {% elif i.status_makeproduct == 'loss' %}
+                        <td class="text-danger">{{i.pro_loss_makeproduct}}</td>
+                        {% else %}
+                        <td >{{i.pro_loss_makeproduct}}</td>
+
+                    {% endif %}
+                           
+
+                            <td>{{i.price_pro_fromshop}}</td>
+                            {% if i.status_purchaseproduct == 'profit' %}
+                            <td class="text-success">{{i.status_purchaseproduct}}</td>
+                            {% elif i.status_purchaseproduct == 'loss' %}
+                            <td class="text-danger">{{i.status_purchaseproduct}}</td>
+                            {% else %}
+                            <td>{{i.status_purchaseproduct}}</td>
+
+                        {% endif %}
+
+                        {% if i.status_purchaseproduct == 'profit' %}
+                        <td class="text-success">{{i.pro_loss_purchaseproduct}}</td>
+                        {% elif i.status_purchaseproduct == 'loss' %}
+                        <td class="text-danger">{{i.pro_loss_purchaseproduct}}</td>
+                        {% else %}
+                        <td>{{i.pro_loss_purchaseproduct}}</td>
+
+                    {% endif %}
+                            
+
+                            <td> <a href="{% url "sell_price" i.id %}" ><button class="btn btn-primary p-2 mr-2" type="submit">sell price</button></a><a href="{% url "expense" i.id %}"><button class="btn btn-info p-2 mr-2" type="submit">Expense</button></a><a href="{% url "purchasepro" i.id %}"><button class="btn btn-success mt-1 mr-2 p-2" type="submit">purchase price</button></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+    </div>
+    </div>
+
+
+
+{% comment %} 
+    <div class="container-fluid">
+        <div class="card mt-5 p-5">
+            <div class="table-responsive">
+                <table id="example" class="table table-striped table-bordered table-hover" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">S.No</th>
+                            <th rowspan="2">Product&nbsp;Name</th>
+                            <th rowspan="2">sell price</th>
+                            <th colspan="3">Product manufacturing</th>
+                            <th rowspan="2">Price of product from shop</th>
+
+                            <th rowspan="2">status</th>
+                           
+                            <th rowspan="2">price of profit/loss</th>
+                            <th rowspan="2">Action</th>
+                        
+                        </tr>
+                        <tr>
+                            <th>Manufacturing Amount</th>
+                            <th>Status</th>
+                            <th>price of profit/loss</th>
+                        </tr>
+
+                     
+                    </thead>
+                    <tbody>
+                        {% for i in x %}
+                        <tr>
+                            <td>{{forloop.counter}}</td>
+                            <td>{{i.product_name}}</td>
+                            <td>{{i.sell_price}}</td>
+                            <td>{{i.makeproduct_price}}</td>
+                            {% if i.status_makeproduct == 'profit' %}
+                            <td class="text-success">{{i.status_makeproduct}}</td>
+                            {% elif i.status_makeproduct == 'loss' %}
+                            <td class="text-danger">{{i.status_makeproduct}}</td>
+                            {% else %}
+                            <td >{{i.status_makeproduct}}</td>
+
+                        {% endif %}
+
+                        {% if i.status_makeproduct == 'profit' %}
+                        <td class="text-success">{{i.pro_loss_makeproduct}}</td>
+                        {% elif i.status_makeproduct == 'loss' %}
+                        <td class="text-danger">{{i.pro_loss_makeproduct}}</td>
+                        {% else %}
+                        <td >{{i.pro_loss_makeproduct}}</td>
+
+                    {% endif %}
+                           
+
+                            <td>{{i.price_pro_fromshop}}</td>
+                            {% if i.status_purchaseproduct == 'profit' %}
+                            <td class="text-success">{{i.status_purchaseproduct}}</td>
+                            {% elif i.status_purchaseproduct == 'loss' %}
+                            <td class="text-danger">{{i.status_purchaseproduct}}</td>
+                            {% else %}
+                            <td>{{i.status_purchaseproduct}}</td>
+
+                        {% endif %}
+
+                        {% if i.status_purchaseproduct == 'profit' %}
+                        <td class="text-success">{{i.pro_loss_purchaseproduct}}</td>
+                        {% elif i.status_purchaseproduct == 'loss' %}
+                        <td class="text-danger">{{i.pro_loss_purchaseproduct}}</td>
+                        {% else %}
+                        <td>{{i.pro_loss_purchaseproduct}}</td>
+
+                    {% endif %}
+                            
+
+                            <td> <a href="{% url "sell_price" i.id %}" ><button class="btn btn-primary p-2 mr-2" type="submit">sell price</button></a><a href="{% url "expense" i.id %}"><button class="btn btn-info p-2 mr-2" type="submit">Expense</button></a><a href="{% url "purchasepro" i.id %}"><button class="btn btn-success mt-1 mr-2 p-2" type="submit">purchase price</button></a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    
+    </div>
+    </div> {% endcomment %}
+
+{% endblock content %}
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct" crossorigin="anonymous"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap4.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#example').DataTable();
+
+    });
+    
+    window.addEventListener( "pageshow", function ( event ) {
+        var perfEntries = performance.getEntriesByType("navigation");
+        if (perfEntries[0].type === "back_forward") {
+          location.reload();
+        }
+       });
+</script>
